@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Grafik Pracowników</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    td.task {
+      background-color: #cde5ff;
+    }
+    #controls {
+      margin-bottom: 20px;
+    }
+    input, button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Grafik Pracowników</h1>
+
+<div id="controls">
+  <input type="text" id="employee" placeholder="Imię pracownika">
+  <input type="text" id="startHour" placeholder="Godzina startu (np. 8:00)">
+  <input type="number" id="duration" placeholder="Długość (godziny)">
+  <input type="text" id="taskName" placeholder="Nazwa zadania">
+  <button onclick="addTask()">Dodaj Zadanie</button>
+</div>
+
+<table id="schedule">
+  <thead>
+    <tr>
+      <th>Pracownik \ Godzina</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script>
+const employees = ["Anna", "Bartek", "Celina", "Damian", "Ewa"];
+const hours = Array.from({length: 11}, (_, i) => `${8 + i}:00`);
+
+function createSchedule() {
+  const theadRow = document.querySelector("#schedule thead tr");
+  hours.forEach(hour => {
+    const th = document.createElement("th");
+    th.textContent = hour;
+    theadRow.appendChild(th);
+  });
+
+  const tbody = document.querySelector("#schedule tbody");
+  employees.forEach(emp => {
+    const tr = document.createElement("tr");
+    const th = document.createElement("th");
+    th.textContent = emp;
+    tr.appendChild(th);
+
+    hours.forEach(hour => {
+      const td = document.createElement("td");
+      td.dataset.employee = emp;
+      td.dataset.hour = hour;
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function addTask() {
+  const emp = document.getElementById("employee").value;
+  const startHour = document.getElementById("startHour").value;
+  const duration = parseInt(document.getElementById("duration").value);
+  const taskName = document.getElementById("taskName").value;
+
+  if (!employees.includes(emp)) {
+    alert("Nie znaleziono pracownika!");
+    return;
+  }
+
+  const startIndex = hours.indexOf(startHour);
+  if (startIndex === -1) {
+    alert("Nieprawidłowa godzina startu!");
+    return;
+  }
+
+  for (let i = 0; i < duration; i++) {
+    const hour = hours[startIndex + i];
+    if (!hour) break;
+
+    const cell = document.querySelector(`td[data-employee="${emp}"][data-hour="${hour}"]`);
+    if (cell) {
+      cell.textContent = taskName;
+      cell.classList.add("task");
+    }
+  }
+}
+
+createSchedule();
+</script>
+
+</body>
+</html>
