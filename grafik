@@ -3,31 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <title>Grafik Pracowników</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-    th, td {
-      border: 1px solid #aaa;
-      padding: 8px;
+
+    h1 {
       text-align: center;
-    }
-    th {
-      background-color: #f0f0f0;
-    }
-    td.task {
-      background-color: #cde5ff;
-    }
-    #controls {
       margin-bottom: 20px;
     }
-    input, button {
-      margin: 5px;
+
+    .controls {
+      max-width: 800px;
+      margin: 0 auto 30px auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .controls input, .controls button {
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .controls button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .controls button:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      text-align: center;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    td.task {
+      background-color: #cce5ff;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -35,7 +77,7 @@
 
 <h1>Grafik Pracowników</h1>
 
-<div id="controls">
+<div class="controls">
   <input type="text" id="employee" placeholder="Imię pracownika">
   <input type="text" id="startHour" placeholder="Godzina startu (np. 8:00)">
   <input type="number" id="duration" placeholder="Długość (godziny)">
@@ -46,35 +88,37 @@
 <table id="schedule">
   <thead>
     <tr>
-      <th>Pracownik \ Godzina</th>
+      <th>Pracownik / Godzina</th>
     </tr>
   </thead>
-  <tbody>
-  </tbody>
+  <tbody></tbody>
 </table>
 
 <script>
 const employees = ["Anna", "Bartek", "Celina", "Damian", "Ewa"];
-const hours = Array.from({length: 11}, (_, i) => `${8 + i}:00`);
+const hours = Array.from({ length: 11 }, (_, i) => `${8 + i}:00`);
 
 function createSchedule() {
-  const theadRow = document.querySelector("#schedule thead tr");
+  const headerRow = document.querySelector("#schedule thead tr");
+
+  // Dodajemy godziny do nagłówka
   hours.forEach(hour => {
     const th = document.createElement("th");
     th.textContent = hour;
-    theadRow.appendChild(th);
+    headerRow.appendChild(th);
   });
 
+  // Tworzymy wiersze pracowników
   const tbody = document.querySelector("#schedule tbody");
-  employees.forEach(emp => {
+  employees.forEach(employee => {
     const tr = document.createElement("tr");
     const th = document.createElement("th");
-    th.textContent = emp;
+    th.textContent = employee;
     tr.appendChild(th);
 
     hours.forEach(hour => {
       const td = document.createElement("td");
-      td.dataset.employee = emp;
+      td.dataset.employee = employee;
       td.dataset.hour = hour;
       tr.appendChild(td);
     });
@@ -84,27 +128,31 @@ function createSchedule() {
 }
 
 function addTask() {
-  const emp = document.getElementById("employee").value;
-  const startHour = document.getElementById("startHour").value;
-  const duration = parseInt(document.getElementById("duration").value);
-  const taskName = document.getElementById("taskName").value;
+  const employee = document.getElementById("employee").value.trim();
+  const startHour = document.getElementById("startHour").value.trim();
+  const duration = parseInt(document.getElementById("duration").value.trim(), 10);
+  const taskName = document.getElementById("taskName").value.trim();
 
-  if (!employees.includes(emp)) {
-    alert("Nie znaleziono pracownika!");
+  if (!employees.includes(employee)) {
+    alert(`Nie znaleziono pracownika "${employee}".`);
     return;
   }
 
   const startIndex = hours.indexOf(startHour);
   if (startIndex === -1) {
-    alert("Nieprawidłowa godzina startu!");
+    alert(`Nieprawidłowa godzina startu "${startHour}".`);
+    return;
+  }
+
+  if (!taskName || isNaN(duration) || duration <= 0) {
+    alert("Podaj poprawną nazwę zadania i czas trwania.");
     return;
   }
 
   for (let i = 0; i < duration; i++) {
     const hour = hours[startIndex + i];
-    if (!hour) break;
-
-    const cell = document.querySelector(`td[data-employee="${emp}"][data-hour="${hour}"]`);
+    if (!hour) break; // koniec godzin
+    const cell = document.querySelector(`td[data-employee="${employee}"][data-hour="${hour}"]`);
     if (cell) {
       cell.textContent = taskName;
       cell.classList.add("task");
@@ -117,3 +165,4 @@ createSchedule();
 
 </body>
 </html>
+
