@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Grafik Trójmiasto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+      color: #333;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .controls select, .controls input, .controls button {
+      padding: 8px;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 120px;
+      min-width: 100px;
+    }
+
+    .controls button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .controls button:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    td.task {
+      background-color: #d1e7ff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    td.task:hover {
+      background-color: #b6dbff;
+    }
+
+    /* Responsywność */
+    @media (max-width: 900px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .controls select,
+      .controls input,
+      .controls button {
+        width: 100%;
+      }
+    }
+
+    /* Zapobieganie przewijaniu poziomemu */
+    html, body {
+      overflow-x: hidden;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Grafik Trójmiasto</h1>
+
+<div class="controls">
+  <select id="employeeSelect">
+    <!-- Wypełnione pracownikami -->
+  </select>
+
+  <select id="startHour">
+    <option value="">Wybierz godzinę</option>
+    <!-- Generowanie godzin co 15 minut -->
+    <script>
+      function generateHours() {
+        const hours = [];
+        for (let h = 0; h < 24; h++) {
+          for (let m = 0; m < 60; m += 15) {
+            let hour = (h < 10 ? '0' : '') + h;
+            let minute = (m === 0 ? '00' : (m === 15 ? '15' : (m === 30 ? '30' : '45')));
+            hours.push(`${hour}:${minute}`);
+          }
+        }
+        return hours;
+      }
+
+      const hours = generateHours();
+      const startHourSelect = document.getElementById("startHour");
+
+      hours.forEach(hour => {
+        const option = document.createElement("option");
+        option.value = hour;
+        option.textContent = hour;
+        startHourSelect.appendChild(option);
+      });
+    </script>
+  </select>
+
+  <input type="number" id="duration" placeholder="Długość (godziny)">
+  <input type="text" id="taskName" placeholder="Nazwa zadania">
+  
+  <!-- Lista wyboru koloru -->
+  <select id="taskColor">
+    <option value="blue">Niebieski (wydanie)</option>
+    <option value="red">Czerwony (zwrot)</option>
+    <option value="violet">Floretowy (serwis)</option>
+    <option value="brown">Brązowy (inne)</option>
+  </select>
+
+  <button onclick="addTask()">Dodaj Zadanie</button>
+
+  <button onclick="clearAllTasks()">Usuń Wszystkie Zadania</button>
+</div>
+
+<table id="schedule">
+  <thead>
+    <tr>
+      <th>Pracownik / Godzina</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+const employees = [
+  "Bujalski Jakub",
+  "Jutrosiński Wiktor",
+  "Karnowski Filip",
+  "Murawski Wiktor",
+  "Nanu Paris",
+  "Paradowski Mateusz",
+  "Pernal Jakub",
+  "Rogacki Jarosław",
+  "Rozwadowski Maciej",
+  "Sulkowski Wojciech",
+  "Witkowski Konrad"
+];
+
+let scheduleData = JSON.parse(localStorage.getItem('scheduleData')) || {};
+
+// Funkcja do tworzenia grafiku
+function createSchedule() {
+  const headerRow = document.querySelector("#schedule thead tr");
+
+  if (headerRow.children.length === 1) {
+    // Generowanie tylko pełnych godzin
+    for (let h = 0; h < 24; h++) {
+      const th = document.createElement("th");
+      th.textContent = (h < 10 ? '0' : '') + h + ":00";
+      headerRow.appendChild(th);
+    }
+  }
+
+  const tbody = document.querySelector("#schedule tbody");
+  tbody.innerHTML = '';
+  employees.forEach(employee => {
+    const tr = document.createElement("tr");
+    const th = document.createElement("th");
+    th.textContent = employee;
+    tr.appendChild(th);
+
+    for (let h = 0; h < 24; h++) {
+      const hour = (h < 10 ? '0' : '') + h + ":00";
+      const td = document.createElement("td");
+      td.dataset.employee = employee;
+      td.dataset.hour = hour;
+      if (scheduleData[employee] && scheduleData[employee][hour]) {
+        const task = scheduleData[employee][hour];
+        td.textContent = task.name;
+        td.classList.add("task");
+        td.style.backgroundColor = task.color; // Kolor tła
+      }
+      tr.appendChild(td);
+    }
+
+    tbody.appendChild(tr);
+  });
+
+  const employeeSelect = document.getElementById("employeeSelect");
+  employeeSelect.innerHTML = '';
+  employees.forEach(employee => {
+    const option = document.createElement("option");
+    option.value = employee;
+    option.textContent = employee;
+    employeeSelect.appendChild(option);
+  });
+}
+
+// Funkcja do zapisywania grafiku w LocalStorage
+function saveSchedule() {
+  localStorage.setItem('scheduleData', JSON.stringify(scheduleData));
+}
+
+// Funkcja do dodawania zadania
+function addTask() {
+  const employee = document.getElementById("employeeSelect").value;
+  const startHour = document.getElementById("startHour").value;
+  const duration = parseInt(document.getElementById("duration").value.trim(), 10);
+  const taskName = document.getElementById("taskName").value.trim();
+  const taskColor = document.getElementById("taskColor").value;
+
+  const startIndex = generateHours().indexOf(startHour);
+  if (startIndex === -1) {
+    alert("Wybierz poprawną godzinę startu.");
+    return;
+  }
+
+  if (!taskName || isNaN(duration) || duration <= 0) {
+    alert("Podaj poprawną nazwę zadania i czas trwania.");
+    return;
+  }
+
+  // Przypisz zadanie do pełnej godziny w grafiku (np. 8:00)
+  const startFullHour = startHour.split(":")[0] + ":00";
+  
+  // Dodanie zadania do danych
+  for (let i = 0; i < duration; i++) {
+    const hour = (parseInt(startFullHour.split(":")[0], 10) + i) % 24;
+    const fullHour = (hour < 10 ? '0' : '') + hour + ":00";
+    if (!scheduleData[employee]) {
+      scheduleData[employee] = {};
+    }
+    scheduleData[employee][fullHour] = { name: taskName, duration, color: taskColor };
+  }
+
+  // Zapisz zmiany w LocalStorage
+  saveSchedule();
+  createSchedule(); // Odśwież grafik po dodaniu zadania
+}
+
+// Funkcja do usuwania wszystkich zadań
+function clearAllTasks() {
+  if (confirm("Czy na pewno chcesz usunąć wszystkie zadania?")) {
+    scheduleData = {}; // Resetuj dane
+    saveSchedule(); // Zapisz pusty grafik w LocalStorage
+    createSchedule(); // Odśwież grafik
+  }
+}
+
+// Inicjalizacja grafiku po załadowaniu strony
+createSchedule();
+</script>
+
+</body>
+</html>
