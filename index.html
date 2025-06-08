@@ -3,123 +3,339 @@
 <head>
   <meta charset="UTF-8">
   <title>Grafik Zadań</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    body { font-family: Arial; margin: 0; background: #f9f9f9; }
-    #form-wrapper { position: fixed; top: 0; left: 0; background: #f9f9f9; z-index: 999; overflow-x: scroll; width: 100vw; white-space: nowrap; }
-    #form-inner { display: inline-block; min-width: max-content; }
-    form { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; }
-    select, input[type="text"] { padding: 5px; margin-left: 5px; }
-    button { padding: 5px 10px; margin-left: 10px; }
-    table { border-collapse: collapse; width: 100%; font-size: 12px; }
-    th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
-    th { background-color: #eee; position: sticky; top: 72px; z-index: 998; }
-    th.full-hour { font-weight: bold; }
-    td:first-child { min-width: 120px; max-width: 120px; width: 120px; font-weight: bold; background: #fff; position: sticky; left: 0; z-index: 997; }
-    .bold-left-border { border-left: 2px solid #000; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f9f9f9;
+    }
+    #form-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #f9f9f9;
+  z-index: 999;
+  overflow-x: scroll;
+  width: 100vw;
+  white-space: nowrap;
+}
+    #form-inner {
+  display: inline-block;
+  min-width: max-content;
+}
+    form {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+    form label {
+      margin: 0 10px 0 0;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+    select, input[type="text"] {
+      padding: 5px;
+      margin-left: 5px;
+    }
+    button {
+      padding: 5px 10px;
+      margin-left: 10px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 5px;
+      text-align: center;
+    }
+    th {
+      background-color: #eee;
+      position: sticky;
+      top: 72px; /* wysokość paska formularza + margines */
+      z-index: 998;
+    }
+    th.full-hour {
+      font-weight: bold;
+    }
+    td:first-child {
+      min-width: 120px;
+      max-width: 120px;
+      width: 120px;
+      font-weight: bold;
+      background: #fff;
+      position: sticky;
+      left: 0;
+      z-index: 997;
+    }
+    .bold-left-border {
+      border-left: 2px solid #000;
+    }
     .wydaj { background-color: lightgreen; }
     .odbierz { background-color: lightblue; }
     .serwis { background-color: yellow; }
     .inne { background-color: pink; }
+    option[value="wydaj"] { background-color: lightgreen; }
+    option[value="odbierz"] { background-color: lightblue; }
+    option[value="serwis"] { background-color: yellow; }
+    option[value="inne"] { background-color: pink; }
   </style>
 </head>
 <body>
-<div id="form-wrapper">
-  <div id="form-inner">
-    <form id="taskForm">
-      <label>Pracownik:
-        <select id="employee">
-          <option>Wiktor J</option><option>Mateusz P</option><option>Filip K</option>
-          <option>Jakub P</option><option>Wojciech S</option><option>Maciej R</option>
-          <option>Paris N</option><option>Mateusz C</option><option>Damian G</option>
-          <option>Jakub K</option><option>Jakub S</option>
-        </select>
-      </label>
-      <label>Start: <select id="startTime"></select></label>
-      <label>Koniec: <select id="endTime"></select></label>
-      <label>Typ zadania:
-        <select id="taskType">
-          <option value="wydaj">Wydaj</option>
-          <option value="odbierz">Odbierz</option>
-          <option value="serwis">Serwis</option>
-          <option value="inne">Inne</option>
-        </select>
-      </label>
-      <label>Treść zadania: <input type="text" id="taskText"></label>
-      <button type="submit">Dodaj Zadanie</button>
-      <button type="button" id="clearAll">Usuń wszystkie</button>
-    </form>
+  <div id="form-wrapper">
+    <div id="form-inner">
+      <form id="taskForm">
+        <label>Pracownik:
+          <select id="employee">
+            <option>Wiktor J</option>
+            <option>Mateusz P</option>
+            <option>Filip K</option>
+            <option>Jakub P</option>
+            <option>Wojciech S</option>
+            <option>Maciej R</option>
+            <option>Paris N</option>
+            <option>Mateusz C</option>
+            <option>Damian G</option>
+            <option>Jakub K</option>
+            <option>Jakub S</option>
+          </select>
+        </label>
+        <label>Start:
+          <select id="startTime"></select>
+        </label>
+        <label>Koniec:
+          <select id="endTime"></select>
+        </label>
+        <label>Typ zadania:
+          <select id="taskType">
+            <option value="wydaj">Wydaj</option>
+            <option value="odbierz">Odbierz</option>
+            <option value="serwis">Serwis</option>
+            <option value="inne">Inne</option>
+          </select>
+        </label>
+        <label>Treść zadania:
+          <input type="text" id="taskText" placeholder="Opis zadania">
+        </label>
+        <button type="submit">Dodaj Zadanie</button>
+      <button type="button" id="clearAll">Usuń wszystkie zadania</button>
+      </form>
+    </div>
   </div>
-</div>
-<h2 style="margin-left: 20px;">Grafik</h2>
-<table id="schedule">
-  <thead><tr><th>Pracownik</th></tr></thead>
-  <tbody></tbody>
-</table>
-<script>
-const SUPABASE_URL = 'https://pshrlxvugjkpszkkwoo.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzaHJseHZ2dWdqa3B6c2trd29vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNjg5OTYsImV4cCI6MjA2NDk0NDk5Nn0.hd5w8I65sKu9HGjZjTCVWZaJICLfneo5gR_zOggSGO8';
-const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const hours = [];
-for (let h = 7; h < 24; h++) for (let m of [0,15,30,45]) hours.push(`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`);
-const startSelect = document.getElementById("startTime");
-const endSelect = document.getElementById("endTime");
-hours.forEach(h => {
-  [startSelect, endSelect].forEach(select => {
-    const opt = document.createElement("option"); opt.value = h; opt.textContent = h; select.appendChild(opt);
+  <h2 style="margin-left: 20px;">Grafik</h2>
+  <table id="schedule">
+    <thead>
+      <tr>
+        <th>Pracownik</th>
+        <!-- Dynamiczne godziny -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dynamiczne wiersze pracowników -->
+    </tbody>
+  </table>
+
+  <script>
+    const hours = [];
+    for (let h = 7; h < 24; h++) {
+      for (let m of [0, 15, 30, 45]) {
+        hours.push(("0"+h).slice(-2) + ":" + ("0"+m).slice(-2));
+      }
+    }
+
+    const startSelect = document.getElementById("startTime");
+    const endSelect = document.getElementById("endTime");
+
+    hours.forEach(h => {
+      const opt1 = document.createElement("option");
+      opt1.value = h;
+      opt1.textContent = h;
+      startSelect.appendChild(opt1);
+
+      const opt2 = document.createElement("option");
+      opt2.value = h;
+      opt2.textContent = h;
+      endSelect.appendChild(opt2);
+    });
+
+    const employees = [
+      "Wiktor J", "Mateusz P", "Filip K", "Jakub P", "Wojciech S",
+      "Maciej R", "Paris N", "Mateusz C", "Damian G", "Jakub K", "Jakub S"
+    ];
+
+    const scheduleHead = document.querySelector("#schedule thead tr");
+    const scheduleBody = document.querySelector("#schedule tbody");
+
+    hours.forEach(h => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      if (h.endsWith(":00")) {
+        th.classList.add("full-hour");
+      }
+      scheduleHead.appendChild(th);
+    });
+
+    employees.forEach(emp => {
+      const tr = document.createElement("tr");
+      tr.dataset.name = emp;
+      const tdName = document.createElement("td");
+      tdName.textContent = emp;
+      tr.appendChild(tdName);
+      hours.forEach(h => {
+        const td = document.createElement("td");
+        if (h.endsWith(":00")) {
+          td.classList.add("bold-left-border");
+        }
+        tr.appendChild(td);
+      });
+      scheduleBody.appendChild(tr);
+    });
+
+    document.getElementById("taskForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const emp = document.getElementById("employee").value;
+      const start = document.getElementById("startTime").value;
+      const end = document.getElementById("endTime").value;
+      const type = document.getElementById("taskType").value;
+      const text = document.getElementById("taskText").value;
+
+      const startIdx = hours.indexOf(start);
+      const endIdx = hours.indexOf(end);
+
+      if (startIdx === -1 || endIdx === -1 || startIdx >= endIdx) {
+        alert("Nieprawidłowe godziny!");
+        return;
+      }
+
+      const row = [...scheduleBody.querySelectorAll("tr")].find(r => r.dataset.name === emp);
+      if (!row) return;
+      const cells = row.querySelectorAll("td");
+
+      for (let i = startIdx + 1; i <= endIdx; i++) {
+        cells[i].classList.add(type);
+        if (i === startIdx + 1 && text) cells[i].textContent = text;
+      }
+    });
+      // Przywróć zadania z localStorage
+    window.addEventListener("load", () => {
+      const saved = localStorage.getItem("grafikZadan");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        parsed.forEach(task => {
+          const { emp, startIdx, endIdx, type, text } = task;
+          const row = [...scheduleBody.querySelectorAll("tr")].find(r => r.dataset.name === emp);
+          if (!row) return;
+          const cells = row.querySelectorAll("td");
+          for (let i = startIdx + 1; i <= endIdx; i++) {
+            cells[i].classList.add(type);
+            if (i === startIdx + 1 && text) cells[i].textContent = text;
+          }
+        });
+      }
+    });
+
+    // Zapisz zadanie do localStorage
+    function saveTask(emp, startIdx, endIdx, type, text) {
+      const current = JSON.parse(localStorage.getItem("grafikZadan") || "[]");
+      current.push({ emp, startIdx, endIdx, type, text });
+      localStorage.setItem("grafikZadan", JSON.stringify(current));
+    }
+
+    // Obsługa formularza
+    document.getElementById("taskForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const emp = document.getElementById("employee").value;
+      const start = document.getElementById("startTime").value;
+      const end = document.getElementById("endTime").value;
+      const type = document.getElementById("taskType").value;
+      const text = document.getElementById("taskText").value;
+
+      const startIdx = hours.indexOf(start);
+      const endIdx = hours.indexOf(end);
+
+      if (startIdx === -1 || endIdx === -1 || startIdx >= endIdx) {
+        alert("Nieprawidłowe godziny!");
+        return;
+      }
+
+      const row = [...scheduleBody.querySelectorAll("tr")].find(r => r.dataset.name === emp);
+      if (!row) return;
+      const cells = row.querySelectorAll("td");
+
+      for (let i = startIdx + 1; i <= endIdx; i++) {
+        cells[i].classList.add(type);
+        if (i === startIdx + 1 && text) cells[i].textContent = text;
+      }
+
+      saveTask(emp, startIdx, endIdx, type, text);
+    });
+
+    // Usuwanie wszystkich zadań
+    document.getElementById("clearAll").addEventListener("click", () => {
+      if (confirm("Czy na pewno chcesz usunąć wszystkie zadania?")) {
+        localStorage.removeItem("grafikZadan");
+        document.querySelectorAll("#schedule tbody tr").forEach(tr => {
+  const tds = tr.querySelectorAll("td");
+  tds.forEach((td, index) => {
+    if (index > 0) {
+      td.classList.remove("wydaj", "odbierz", "serwis", "inne");
+      if (!td.classList.contains("bold-left-border")) td.className = "";
+      td.textContent = "";
+    }
   });
 });
-const employees = ["Wiktor J", "Mateusz P", "Filip K", "Jakub P", "Wojciech S", "Maciej R", "Paris N", "Mateusz C", "Damian G", "Jakub K", "Jakub S"];
-const scheduleHead = document.querySelector("#schedule thead tr");
-const scheduleBody = document.querySelector("#schedule tbody");
-hours.forEach(h => { const th = document.createElement("th"); th.textContent = h; if (h.endsWith(":00")) th.classList.add("full-hour"); scheduleHead.appendChild(th); });
-employees.forEach(emp => {
-  const tr = document.createElement("tr"); tr.dataset.name = emp;
-  const tdName = document.createElement("td"); tdName.textContent = emp; tr.appendChild(tdName);
-  hours.forEach(h => { const td = document.createElement("td"); if (h.endsWith(":00")) td.classList.add("bold-left-border"); tr.appendChild(td); });
-  scheduleBody.appendChild(tr);
-});
-
-function renderTask(task) {
-  const { id, employee, start, end, type, text } = task;
-  const startIdx = hours.indexOf(start);
-  const endIdx = hours.indexOf(end);
-  const row = [...scheduleBody.querySelectorAll("tr")].find(r => r.dataset.name === employee);
-  if (!row) return;
-  const cells = row.querySelectorAll("td");
-  for (let i = startIdx + 1; i <= endIdx; i++) {
-    cells[i].classList.add(type);
-    cells[i].dataset.taskId = id;
-    if (i === startIdx + 1 && text) cells[i].textContent = text;
-  }
-}
-
-document.getElementById("taskForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const emp = document.getElementById("employee").value;
-  const start = document.getElementById("startTime").value;
-  const end = document.getElementById("endTime").value;
-  const type = document.getElementById("taskType").value;
-  const text = document.getElementById("taskText").value;
-  const { data, error } = await supabaseClient.from("tasks").insert([{ employee: emp, start, end, type, text }]);
-  if (data) renderTask(data[0]);
-});
-
-window.addEventListener("load", async () => {
-  const { data, error } = await supabaseClient.from("tasks").select();
-  if (data) data.forEach(renderTask);
-});
-
-document.getElementById("clearAll").addEventListener("click", async () => {
-  if (confirm("Usunąć wszystkie zadania?")) {
-    await supabaseClient.from("tasks").delete().neq("id", "");
-    document.querySelectorAll("#schedule tbody td").forEach(td => {
-      td.className = ""; td.textContent = ""; delete td.dataset.taskId;
+      }
     });
+
+// Obsługa kliknięcia na zadanie – usuwanie zadania
+document.querySelector("#schedule").addEventListener("click", function(e) {
+  const cell = e.target;
+  const validTypes = ["wydaj", "odbierz", "serwis", "inne"];
+  const cellType = validTypes.find(type => cell.classList.contains(type));
+
+  if (!cellType) return;
+
+  if (confirm("Czy chcesz usunąć to zadanie?")) {
+    const row = cell.parentElement;
+    const emp = row.dataset.name;
+    const allCells = Array.from(row.querySelectorAll("td"));
+    const idx = allCells.indexOf(cell);
+
+    const current = JSON.parse(localStorage.getItem("grafikZadan") || "[]");
+
+    // Znajdź zadanie, do którego należy kliknięta komórka
+    const task = current.find(task =>
+      task.emp === emp &&
+      idx >= task.startIdx + 1 &&
+      idx <= task.endIdx &&
+      task.type === cellType
+    );
+
+    if (!task) return;
+
+    // Filtruj i zapisz zaktualizowaną listę
+    const updated = current.filter(t => t !== task);
+    localStorage.setItem("grafikZadan", JSON.stringify(updated));
+
+    // Wyczyść zadanie z komórek
+    for (let i = task.startIdx + 1; i <= task.endIdx && i < allCells.length; i++) {
+      const td = allCells[i];
+      td.classList.remove("wydaj", "odbierz", "serwis", "inne");
+      td.textContent = "";
+    }
   }
 });
+
 </script>
 </body>
 </html>
