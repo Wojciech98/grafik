@@ -49,7 +49,7 @@
       margin-left: 10px;
     }
     table {
-      border-collapse: collapse;
+      
       width: 100%;
       font-size: 12px;
     }
@@ -84,10 +84,12 @@
     .odbierz { background-color: lightblue; }
     .serwis { background-color: yellow; }
     .inne { background-color: pink; }
+    .dyspo { background-color: black !important; }
     option[value="wydaj"] { background-color: lightgreen; }
     option[value="odbierz"] { background-color: lightblue; }
     option[value="serwis"] { background-color: yellow; }
     option[value="inne"] { background-color: pink; }
+    option[value="dyspo"] { background-color: black; color: white; }
   </style>
 </head>
 <body>
@@ -121,6 +123,7 @@
             <option value="odbierz">Odbierz</option>
             <option value="serwis">Serwis</option>
             <option value="inne">Inne</option>
+            <option value="dyspo">Dyspozycyjność</option>
           </select>
         </label>
         <label>Treść zadania:
@@ -194,7 +197,7 @@
       hours.forEach(h => {
         const td = document.createElement("td");
         if (h.endsWith(":00")) {
-          td.classList.add("bold-left-border");
+          
         }
         tr.appendChild(td);
       });
@@ -221,10 +224,27 @@
       if (!row) return;
       const cells = row.querySelectorAll("td");
 
+      
       for (let i = startIdx + 1; i <= endIdx; i++) {
-        cells[i].classList.add(type);
-        if (i === startIdx + 1 && text) cells[i].textContent = text;
+        const cell = cells[i];
+
+        // Dyspozycyjność nie nadpisuje innych zadań
+        if (type === "dyspo" && cell.classList.length > 0) continue;
+
+        // Zadanie nadpisuje dyspozycyjność, ale nie inne zadania
+        if (type !== "dyspo" && cell.classList.contains("dyspo")) {
+          cell.classList.remove("dyspo");
+        }
+
+        // Usuń inne typy jeśli nie dyspo
+        if (type !== "dyspo") {
+          cell.classList.remove("wydaj", "odbierz", "serwis", "inne");
+        }
+
+        cell.classList.add(type);
+        if (i === startIdx + 1 && text) cell.textContent = text;
       }
+
     });
       // Przywróć zadania z localStorage
     window.addEventListener("load", () => {
@@ -236,10 +256,27 @@
           const row = [...scheduleBody.querySelectorAll("tr")].find(r => r.dataset.name === emp);
           if (!row) return;
           const cells = row.querySelectorAll("td");
-          for (let i = startIdx + 1; i <= endIdx; i++) {
-            cells[i].classList.add(type);
-            if (i === startIdx + 1 && text) cells[i].textContent = text;
-          }
+          
+      for (let i = startIdx + 1; i <= endIdx; i++) {
+        const cell = cells[i];
+
+        // Dyspozycyjność nie nadpisuje innych zadań
+        if (type === "dyspo" && cell.classList.length > 0) continue;
+
+        // Zadanie nadpisuje dyspozycyjność, ale nie inne zadania
+        if (type !== "dyspo" && cell.classList.contains("dyspo")) {
+          cell.classList.remove("dyspo");
+        }
+
+        // Usuń inne typy jeśli nie dyspo
+        if (type !== "dyspo") {
+          cell.classList.remove("wydaj", "odbierz", "serwis", "inne");
+        }
+
+        cell.classList.add(type);
+        if (i === startIdx + 1 && text) cell.textContent = text;
+      }
+
         });
       }
     });
@@ -272,10 +309,27 @@
       if (!row) return;
       const cells = row.querySelectorAll("td");
 
+      
       for (let i = startIdx + 1; i <= endIdx; i++) {
-        cells[i].classList.add(type);
-        if (i === startIdx + 1 && text) cells[i].textContent = text;
+        const cell = cells[i];
+
+        // Dyspozycyjność nie nadpisuje innych zadań
+        if (type === "dyspo" && cell.classList.length > 0) continue;
+
+        // Zadanie nadpisuje dyspozycyjność, ale nie inne zadania
+        if (type !== "dyspo" && cell.classList.contains("dyspo")) {
+          cell.classList.remove("dyspo");
+        }
+
+        // Usuń inne typy jeśli nie dyspo
+        if (type !== "dyspo") {
+          cell.classList.remove("wydaj", "odbierz", "serwis", "inne");
+        }
+
+        cell.classList.add(type);
+        if (i === startIdx + 1 && text) cell.textContent = text;
       }
+
 
       saveTask(emp, startIdx, endIdx, type, text);
     });
